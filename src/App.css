@@ -28,6 +28,15 @@
   color: #61dafb;
 }
 
+.autocomplete-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* Adds space between Autocomplete components */
+  margin-top: 50px;
+}
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +44,29 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Add or modify these styles in your App.css file */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.map-container {
+  flex: 1; /* Adjust as needed */
+  margin-left:50px;
+  margin-top: 50px;
+
+}
+
+.autocomplete-container {
+  flex: 1; /* Adjust as needed */
 }
