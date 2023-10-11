@@ -1,0 +1,21 @@
+.blocker{
+    margin-top: 50px;
+}
+
+.image-wrapper{
+    margin: 50px;
+}
+
+.buttonclass {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .buttonerror {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
