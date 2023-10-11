@@ -7,6 +7,7 @@ import Home from './components/Home/Home'
 import About from './components/About/About'
 import Guide from './components/Guide/Guide'
 import Blockers from './components/Blockers/Blockers'
+import Footer from './components/Footer/Footer'; 
 
 function App() { 
   return ( 
@@ -20,7 +21,9 @@ function App() {
         <Route path='/blockers' element={<Blockers />} /> 
         <Route path='/maps' element={<ShortestPath />} /> 
       </Routes> 
+      <Footer />
     </Router> 
+    
   ); 
 } 
 

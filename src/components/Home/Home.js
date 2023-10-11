@@ -44,7 +44,7 @@ const Home = () => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100vh',
+    height: '85vh',
     color: 'white', // Adjust the text color based on the background image
   };
 
