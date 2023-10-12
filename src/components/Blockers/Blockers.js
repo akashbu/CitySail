@@ -84,29 +84,28 @@ const Blockers = () => {
     setOpen(false);
     setReport(false);
     setSame(false);
-	setClear(false)
+    setClear(false);
   };
 
   useEffect(() => {
     async function fetchDataFromServer() {
       const apiUrl = "http://localhost:5000/data"; // Replace 'items' with your resource name
 
-      const jsonData = localStorage.getItem('distanceMatrix');
+      const jsonData = localStorage.getItem("distanceMatrix");
 
-      if (jsonData){
+      if (jsonData) {
         const data = JSON.parse(jsonData);
         setDistanceMatrix(data);
-      }else{
-
-      try {
-        const response = await axios.get(apiUrl);
-        const data = response.data; // This contains the retrieved data
-        setDistanceMatrix(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } else {
+        try {
+          const response = await axios.get(apiUrl);
+          const data = response.data; // This contains the retrieved data
+          setDistanceMatrix(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     }
-  }
 
     fetchDataFromServer();
   }, []);
@@ -143,9 +142,9 @@ const Blockers = () => {
       distanceMatrix[sourceId][destinationId] = 999;
       console.log(distanceMatrix);
 
-    	const distanceMatrixJSON = JSON.stringify(distanceMatrix);
-        localStorage.setItem("distanceMatrix", distanceMatrixJSON);
-        console.log("Distance matrix saved to local storage.");
+      const distanceMatrixJSON = JSON.stringify(distanceMatrix);
+      localStorage.setItem("distanceMatrix", distanceMatrixJSON);
+      console.log("Distance matrix saved to local storage.");
       setReport(true);
     } else {
       setOpen(true);
@@ -154,11 +153,11 @@ const Blockers = () => {
   };
 
   const clearBlockage = () => {
-	localStorage.removeItem("distanceMatrix");
-	setClear(true)
-  }
-  
-  console.log(distanceMatrix)
+    localStorage.removeItem("distanceMatrix");
+    setClear(true);
+  };
+
+  console.log(distanceMatrix);
 
   return (
     <div className="blocker">
@@ -193,7 +192,7 @@ const Blockers = () => {
           </div>
         </Marquee>
       </div>
-      <div className="autocomplete-container">
+      <div className="autocomplete-container-blocker">
         <Autocomplete
           disablePortal
           id="source-auto"
@@ -228,7 +227,12 @@ const Blockers = () => {
         </Button>
       </div>
       <div className="buttonerror">
-        <Button variant="outlined" size="large" color="error" onClick={clearBlockage}>
+        <Button
+          variant="outlined"
+          size="large"
+          color="error"
+          onClick={clearBlockage}
+        >
           Clear All Blockage
         </Button>
       </div>
@@ -257,7 +261,8 @@ const Blockers = () => {
           severity="success"
           sx={{ width: "100%", fontSize: "1.3em" }}
         >
-          Blockage Reported from {selectedLocations.source} - {selectedLocations.destination}
+          Blockage Reported from {selectedLocations.source} -{" "}
+          {selectedLocations.destination}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -271,10 +276,10 @@ const Blockers = () => {
           severity="warning"
           sx={{ width: "100%", fontSize: "1.3em" }}
         >
-          Please Select Different Source and Destination
+          Please Select Different Source and Destination!
         </Alert>
       </Snackbar>
-	  <Snackbar
+      <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={clear}
         autoHideDuration={6000}

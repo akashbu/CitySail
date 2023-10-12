@@ -4,7 +4,7 @@ import './Footer.css';
 const Footer = () => {
   return (
     <footer className='footer'>
-      &copy; 2023 Navigator
+      &copy; 2023 CitySail
     </footer>
   );
 };

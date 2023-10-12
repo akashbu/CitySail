@@ -1,0 +1,37 @@
+.content {
+    text-align: center;
+    padding: 20px;
+    background-color: #afd8fa;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 95%;
+  }
+  
+  .content h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .content p {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  
+  .image-wrapper {
+    text-align: center;
+  }
+  
+  .profile-info {
+    text-align: center;
+  }
+  
+  .profile-info h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .profile-info p {
+    font-size: 18px;
+    line-height: 1.5;
+  }

@@ -7,7 +7,7 @@
 }
 
 .buttonclass {
-    margin-top: 30px;
+    margin-top: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,4 +18,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .autocomplete-container-blocker{
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
   }

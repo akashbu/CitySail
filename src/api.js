@@ -144,7 +144,7 @@ function printDistanceMatrix(matrix) {
 
 async function main(){
 await createDistanceMatrix()
-saveDistanceMatrixToFile(distanceMatrix, 'distance_matrix3.json');
+saveDistanceMatrixToFile(distanceMatrix, 'distance_matrix2.json');
 printDistanceMatrix(distanceMatrix);
 createOpitimizeMatrix()
 console.log("Optimized Distance Matrix:")

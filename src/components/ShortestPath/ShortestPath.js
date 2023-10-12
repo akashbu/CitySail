@@ -1,5 +1,5 @@
 import React from "react";
-import './ShortestPath.css'; 
+import "./ShortestPath.css";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet"; // Import Leaflet library
 import {
@@ -15,6 +15,20 @@ import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
+import RoutingMachine from "./RoutingMachine";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
 // Create a custom marker icon
 const customMarkerIcon = new L.Icon({
@@ -80,6 +94,31 @@ const ShortestPath = () => {
     source: null,
     destination: null,
   });
+  const [intermediates, setIntermediates] = useState({});
+  const [path, setPath] = useState([]);
+  const [alertBox, setAlertBox] = useState(false);
+  const [successful, setSucessful] = React.useState(false);
+  const [same, setSame] = React.useState(false);
+  const [info, setInfo] = useState(false);
+  const [blockedLocations, setBlockedLocations] = useState([]);
+  const [open1, setOpen1] = React.useState(false);
+  const [open2, setOpen2] = React.useState(false);
+  const [blockedPaths, setBlockedPaths] = useState([]);
+
+  const handleClickOpen1 = () => {
+    setOpen1(true);
+  };
+  const handleClickOpen2 = () => {
+    setOpen2(true);
+  };
+
+  const handleClose1 = () => {
+    setOpen1(false);
+  };
+
+  const handleClose2 = () => {
+    setOpen2(false);
+  };
 
   function printDistanceMatrix(matrix) {
     const numLocations = matrix.length;
@@ -104,29 +143,47 @@ const ShortestPath = () => {
   useEffect(() => {
     async function fetchDataFromServer() {
       const apiUrl = "http://localhost:5000/data"; // Replace 'items' with your resource name
-    
-      const jsonData = localStorage.getItem('distanceMatrix');
 
-      if (jsonData){
+      const jsonData = localStorage.getItem("distanceMatrix");
+
+      if (jsonData) {
         const data = JSON.parse(jsonData);
         setDistanceMatrix(data);
+        findUnreachableLocations(data);
         createOptimizeMatrix(data);
-      }else{
-      try {
-        const response = await axios.get(apiUrl);
-        const data = response.data; // This contains the retrieved data
-        setDistanceMatrix(data);
-        createOptimizeMatrix(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } else {
+        try {
+          const response = await axios.get(apiUrl);
+          const data = response.data; // This contains the retrieved data
+          setDistanceMatrix(data);
+          createOptimizeMatrix(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     }
+
+    function findUnreachableLocations(matrix) {
+      const pairs = [];
+      matrix.forEach((row, i) => {
+        row.forEach((value, j) => {
+          if (value === 999) {
+            pairs.push({
+              source: locations[i].name,
+              destination: locations[j].name,
+            });
+          }
+        });
+      });
+
+      setBlockedLocations(pairs);
     }
 
     fetchDataFromServer();
   }, []);
 
   function createOptimizeMatrix(matrix) {
+    const newIntermediates = {};
     const numLocations = matrix.length;
     const optimizedMatrix = JSON.parse(JSON.stringify(matrix)); // Create a deep copy of the matrix
 
@@ -139,87 +196,408 @@ const ShortestPath = () => {
           ) {
             optimizedMatrix[i][j] =
               optimizedMatrix[i][k] + optimizedMatrix[k][j];
+            const key = `${locations[i].name}-${locations[j].name}`;
+            newIntermediates[key] = locations[k].name;
           }
         }
       }
     }
 
+    // console.log("Intermediate Nodes", newIntermediates);
+    setIntermediates(newIntermediates);
     setOptimizedDistanceMatrix(optimizedMatrix); // Update the optimized matrix state
   }
 
-  console.log("Distance Matrix:");
-  printDistanceMatrix(distanceMatrix);
+  // console.log("Distance Matrix:");
+  // printDistanceMatrix(distanceMatrix);
 
-  console.log("Optimized Matrix");
-  printDistanceMatrix(optimizedDistanceMatrix);
+  // console.log("Optimized Matrix");
+  // printDistanceMatrix(optimizedDistanceMatrix);
 
-  const calculateShortestPath = () => {
-    setSelectedLocations({
-      source: sourceRef.current,
-      destination: destinationRef.current,
-    });
+  useEffect(() => {
+    if (
+      selectedLocations.source?.label &&
+      selectedLocations.destination?.label
+    ) {
+      // const sourceName = selectedLocations.source?.label
+      // const destinationName = selectedLocations.destination?.label
+      const sourceLocation = locations.find(
+        (loc) => loc.name === selectedLocations.source?.label
+      );
+      const destinationLocation = locations.find(
+        (loc) => loc.name === selectedLocations.destination?.label
+      );
+      const intermediateKey = `${sourceLocation.name}-${destinationLocation.name}`;
+
+      if (intermediates[intermediateKey]) {
+        const intermediateLocation = locations.find(
+          (loc) => loc.name === intermediates[intermediateKey]
+        );
+        setPath([
+          { lat: sourceLocation.lat, lon: sourceLocation.lon },
+          { lat: intermediateLocation.lat, lon: intermediateLocation.lon },
+          { lat: destinationLocation.lat, lon: destinationLocation.lon },
+        ]);
+      } else {
+        setPath([
+          { lat: sourceLocation.lat, lon: sourceLocation.lon },
+          { lat: destinationLocation.lat, lon: destinationLocation.lon },
+        ]);
+      }
+    }
+  }, [selectedLocations, intermediates]);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertBox(false);
+    setSucessful(false);
+    setSame(false);
   };
 
-  console.log(selectedLocations.source, selectedLocations.destination);
+  const calculateShortestPath = () => {
+    const sourceName = sourceRef.current?.label;
+    const destinationName = destinationRef.current?.label;
 
-//   if (
-//     selectedLocations.source &&
-//     selectedLocations.source.label === "Fullerton"
-//   ) {
-//     console.log("True");
-//   }
+    if (sourceName && destinationName) {
+      if (sourceName === destinationName) {
+        setSame(true);
+        return;
+      }
 
+      setPath([]);
+      setSelectedLocations({
+        source: sourceRef.current,
+        destination: destinationRef.current,
+      });
+      setSucessful(true);
+      setInfo(true);
+    } else {
+      setAlertBox(true);
+    }
+  };
+
+  const refreshButton = () => {
+    window.location.href = "/maps";
+  };
+
+  useEffect(() => {
+    const blockedPaths = blockedLocations.map((blocked) => {
+      const source = locations.find((loc) => loc.name === blocked.source);
+      const destination = locations.find(
+        (loc) => loc.name === blocked.destination
+      );
+      return {
+        from: [source.lat, source.lon],
+        to: [destination.lat, destination.lon],
+      };
+    });
+
+    setBlockedPaths(blockedPaths);
+  }, [blockedLocations]);
+
+  // console.log(
+  //   selectedLocations.source?.label,
+  //   selectedLocations.destination?.label
+  // );
+  // console.log(path);
+  console.log("Blocked Locations:", blockedLocations);
 
   return (
     <div className="container">
-      <div className="map-container">
-        <MapContainer
-          center={constantPositions[0]}
-          zoom={11}
-          scrollWheelZoom={false}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=GSifio1YoG2l3lcMqzrJ"
-          />
-          {locations.map((location, index) => (
-            <Marker
-              key={index}
-              position={[location.lat, location.lon]}
-              icon={customMarkerIcon}
+      <div className="top-container">
+        <div className="map-container">
+          <MapContainer
+            center={constantPositions[0]}
+            zoom={11}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=GSifio1YoG2l3lcMqzrJ"
+            />
+            {locations.map((location, index) => (
+              <Marker
+                key={index}
+                position={[location.lat, location.lon]}
+                icon={customMarkerIcon}
+              >
+                <Popup>{location.name}</Popup>
+              </Marker>
+            ))}
+
+            {blockedPaths?.map((blockedPath, index) => (
+              <RoutingMachine
+                key={index}
+                from={blockedPath.from}
+                to={blockedPath.to}
+                isBlocked={true} // Pass true to set the color to red
+              />
+            ))}
+
+            {path.length > 1 && (
+              <>
+                <RoutingMachine
+                  from={[path[0].lat, path[0].lon]}
+                  to={[path[1].lat, path[1].lon]}
+                />
+                {path.slice(1, -1).map((point, index) => (
+                  <RoutingMachine
+                    key={index}
+                    from={[point.lat, point.lon]}
+                    to={[path[index + 2].lat, path[index + 2].lon]}
+                    isBlocked={false}
+                  />
+                ))}
+              </>
+            )}
+          </MapContainer>
+        </div>
+        <div className="autocomplete-container">
+          <div className="top-autocomplete">
+            <Autocomplete
+              disablePortal
+              id="source-auto"
+              options={list}
+              sx={{ width: 300 }}
+              renderInput={(params) => <TextField {...params} label="Source" />}
+              onChange={(event, newValue) => {
+                sourceRef.current = newValue;
+              }}
+            />
+            <Autocomplete
+              disablePortal
+              id="destination-auto"
+              options={list}
+              sx={{ width: 300 }}
+              renderInput={(params) => (
+                <TextField {...params} label="Destination" />
+              )}
+              onChange={(event, newValue) => {
+                destinationRef.current = newValue;
+              }}
+            />
+            <Button
+              variant="outlined"
+              color="primary"
+              size="large"
+              onClick={calculateShortestPath}
             >
-              <Popup>{location.name}</Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
-      <div className="autocomplete-container">
-        <Autocomplete
-          disablePortal
-          id="source-auto"
-          options={list}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Source" />}
-          onChange={(event, newValue) => {
-            sourceRef.current = newValue;
-          }}
-        />
-        <Autocomplete
-          disablePortal
-          id="destination-auto"
-          options={list}
-          sx={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField {...params} label="Destination" />
+              Calculate Shortest Path
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="large"
+              onClick={refreshButton}
+            >
+              Refresh
+            </Button>
+          </div>
+          {info && (
+            <div className="info-container" style={{ width: '100%', border: '1px solid lightgrey', padding: '10px', borderRadius: '5px' }}>
+              <h3>
+                <u>Details</u>
+              </h3>
+              <p>
+                <strong>Source:</strong> {selectedLocations.source?.label}
+              </p>
+              <p>
+                <strong>Destination:</strong>{" "}
+                {selectedLocations.destination?.label}
+              </p>
+              {path.length > 2 && (
+                <p>
+                  <strong>Intermediate Node:</strong>{" "}
+                  {
+                    locations.find(
+                      (loc) =>
+                        loc.lat === path[1].lat && loc.lon === path[1].lon
+                    )?.name
+                  }
+                </p>
+              )}
+              {optimizedDistanceMatrix.length > 0 &&
+                selectedLocations.source &&
+                selectedLocations.destination && (
+                  <p>
+                    <strong>Total Distance:</strong>{" "}
+                    {optimizedDistanceMatrix[
+                      locations.findIndex(
+                        (loc) => loc.name === selectedLocations.source.label
+                      )
+                    ][
+                      locations.findIndex(
+                        (loc) =>
+                          loc.name === selectedLocations.destination.label
+                      )
+                    ].toFixed(2)}{" "}
+                    km
+                  </p>
+                )}
+
+              {blockedLocations.length > 0 && (
+                <div className="blocked-locations-container">
+                  <h3>
+                    <u>Blocked Paths</u>
+                  </h3>
+                  {blockedLocations.map((blocked, index) => (
+                    <p key={index}>
+                      <strong>Path {index + 1}:</strong> {blocked.source} -{" "}
+                      {blocked.destination}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
-          onChange={(event, newValue) => {
-            destinationRef.current = newValue;
-          }}
-        />
-        <Button variant="outlined" color="primary" size="large" onClick={calculateShortestPath}>
-          Calculate Shortest Path
-        </Button>
+        </div>
       </div>
+
+      <div className="bottom-container">
+        <Button variant="outlined" color="primary" onClick={handleClickOpen1}>
+          View Distance Matrix
+        </Button>
+        <Dialog
+          open={open1}
+          onClose={handleClose1}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth="xl"
+          fullWidth={true}
+        >
+          <DialogTitle id="alert-dialog-title" style={{ fontWeight: 'bold',textDecoration: 'underline' }}>{"Distance Matrix"}</DialogTitle>
+          <DialogContent>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Location</TableCell>
+                    {locations.map((location, index) => (
+                      <TableCell key={index} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{location.name}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {distanceMatrix.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{locations[rowIndex].name}</TableCell>
+                      {row.map((cell, cellIndex) => (
+                        <TableCell
+                          key={cellIndex}
+                          style={{ color: cell === 999 ? "red" : "inherit" }}
+                        >
+                          {parseFloat(cell).toFixed(2)} km
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose1} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+
+      <div className="bottom-container2">
+        <Button variant="outlined" color="primary" onClick={handleClickOpen2}>
+          View Optimize Matrix
+        </Button>
+        <Dialog
+          open={open2}
+          onClose={handleClose2}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth="xl"
+          fullWidth={true}
+        >
+          <DialogTitle id="alert-dialog-title" style={{ fontWeight: 'bold',textDecoration: 'underline' }}>
+            {"Optimize Distance Matrix"}
+          </DialogTitle>
+          <DialogContent>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ fontWeight: 'bold',textDecoration: 'underline' }}>Location</TableCell>
+                    {locations.map((location, index) => (
+                      <TableCell key={index} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{location.name}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {optimizedDistanceMatrix.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{locations[rowIndex].name}</TableCell>
+                      {row.map((cell, cellIndex) => (
+                        <TableCell key={cellIndex}>
+                          {parseFloat(cell).toFixed(2)} km
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose2} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={alertBox}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", fontSize: "1.3em" }}
+        >
+          Please select both source and destination!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={same}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", fontSize: "1.3em" }}
+        >
+          Please select different Source and Destination!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={successful}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{ width: "100%", fontSize: "1.3em" }}
+        >
+          Calculated shortest route between {selectedLocations.source?.label} -{" "}
+          {selectedLocations.destination?.label}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

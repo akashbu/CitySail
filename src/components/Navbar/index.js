@@ -16,7 +16,7 @@ const Navbar = () => {
               marginRight: '10px', // Optional: Add some right margin for spacing
             }}
           />
-          <span style={{ color: 'white', fontSize: '2em' }}>Navigator</span>
+          <span style={{ color: 'white', fontSize: '2em' }}>CitySail</span>
         </div>
         <Bars />
 
