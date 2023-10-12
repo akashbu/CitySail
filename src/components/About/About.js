@@ -20,7 +20,7 @@ return (
         </p>
       </div>
 	<div className="marquee">
-        <Marquee gradient={true} pauseOnHover={true} delay={1}>
+        <Marquee gradient={true} pauseOnHover={true} delay={0} speed={100}>
 		<div className="image-wrapper">
             <img src={img1} height={300} width={300} alt="" />
 			<div className="profile-info">
