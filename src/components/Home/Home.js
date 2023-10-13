@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import backgroundImage from '../../image/map.jpeg'; // Replace with the actual path to your image
+import backgroundImage from '../../image/map.jpeg';
 
 const Home = () => {
   const textLines = ['Navigate through the shortest path!!', 'Discover new routes!!', 'Reach your destination faster!!'];

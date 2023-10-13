@@ -30,7 +30,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
-// Create a custom marker icon
+// Creating a custom marker icon for the map
 const customMarkerIcon = new L.Icon({
   iconUrl: icon,
   iconSize: [32, 32], // Size of the icon
@@ -38,6 +38,7 @@ const customMarkerIcon = new L.Icon({
   popupAnchor: [0, -32], // Popup anchor point
 });
 
+// List of locations with their respective coordinates
 const locations = [
   { id: 0, name: "Fullerton", lat: 33.8704, lon: -117.9242 },
   { id: 1, name: "Long Beach", lat: 33.77005, lon: -118.193741 },
@@ -84,6 +85,7 @@ const list = [
   { label: "Diamond Bar" },
 ];
 
+// Main component for shortest path calculation
 const ShortestPath = () => {
   const constantPositions = [[33.8704, -117.9242]];
   const [distanceMatrix, setDistanceMatrix] = useState([]);
@@ -105,13 +107,17 @@ const ShortestPath = () => {
   const [open2, setOpen2] = React.useState(false);
   const [blockedPaths, setBlockedPaths] = useState([]);
 
+  // Function to open the first dialog box
   const handleClickOpen1 = () => {
     setOpen1(true);
   };
+
+  // Function to open the second dialog box
   const handleClickOpen2 = () => {
     setOpen2(true);
   };
 
+  // Functions to close dialog boxes
   const handleClose1 = () => {
     setOpen1(false);
   };
@@ -140,9 +146,10 @@ const ShortestPath = () => {
     }
   }
 
+  // Fetch data from the server and set up the distance matrix
   useEffect(() => {
     async function fetchDataFromServer() {
-      const apiUrl = "http://localhost:5000/data"; // Replace 'items' with your resource name
+      const apiUrl = "https://map-project-qf27.onrender.com/data"; // Replace 'items' with your resource name
 
       const jsonData = localStorage.getItem("distanceMatrix");
 
@@ -182,6 +189,7 @@ const ShortestPath = () => {
     fetchDataFromServer();
   }, []);
 
+  // Function to create an optimized distance matrix using Floyd-Warshall algorithm
   function createOptimizeMatrix(matrix) {
     const newIntermediates = {};
     const numLocations = matrix.length;
@@ -214,6 +222,7 @@ const ShortestPath = () => {
   // console.log("Optimized Matrix");
   // printDistanceMatrix(optimizedDistanceMatrix);
 
+  // Update path whenever selected locations change
   useEffect(() => {
     if (
       selectedLocations.source?.label &&
@@ -257,6 +266,7 @@ const ShortestPath = () => {
     setSame(false);
   };
 
+  // Function to calculate the shortest path when the "Calculate Shortest Path" button is clicked
   const calculateShortestPath = () => {
     const sourceName = sourceRef.current?.label;
     const destinationName = destinationRef.current?.label;
@@ -283,6 +293,7 @@ const ShortestPath = () => {
     window.location.href = "/maps";
   };
 
+  // Update blocked paths when blocked locations change
   useEffect(() => {
     const blockedPaths = blockedLocations.map((blocked) => {
       const source = locations.find((loc) => loc.name === blocked.source);
@@ -298,13 +309,6 @@ const ShortestPath = () => {
     setBlockedPaths(blockedPaths);
   }, [blockedLocations]);
 
-  // console.log(
-  //   selectedLocations.source?.label,
-  //   selectedLocations.destination?.label
-  // );
-  // console.log(path);
-  console.log("Blocked Locations:", blockedLocations);
-
   return (
     <div className="container">
       <div className="top-container">
@@ -318,6 +322,7 @@ const ShortestPath = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://api.maptiler.com/maps/basic-v2/256/{z}/{x}/{y}.png?key=GSifio1YoG2l3lcMqzrJ"
             />
+            {/* Iterating over the locations and placing markers on the map */}
             {locations.map((location, index) => (
               <Marker
                 key={index}
@@ -336,7 +341,7 @@ const ShortestPath = () => {
                 isBlocked={true} // Pass true to set the color to red
               />
             ))}
-
+            {/* Displaying the calculated shortest path on the map */}
             {path.length > 1 && (
               <>
                 <RoutingMachine
@@ -379,6 +384,7 @@ const ShortestPath = () => {
                 destinationRef.current = newValue;
               }}
             />
+            {/* Button to calculate the shortest path */}
             <Button
               variant="outlined"
               color="primary"
@@ -396,8 +402,17 @@ const ShortestPath = () => {
               Refresh
             </Button>
           </div>
+          {/* Information container to display details of the calculated path */}
           {info && (
-            <div className="info-container" style={{ width: '100%', border: '1px solid lightgrey', padding: '10px', borderRadius: '5px' }}>
+            <div
+              className="info-container"
+              style={{
+                width: "100%",
+                border: "1px solid lightgrey",
+                padding: "10px",
+                borderRadius: "5px",
+              }}
+            >
               <h3>
                 <u>Details</u>
               </h3>
@@ -460,6 +475,7 @@ const ShortestPath = () => {
         <Button variant="outlined" color="primary" onClick={handleClickOpen1}>
           View Distance Matrix
         </Button>
+        {/* Dialog to display the distance matrix */}
         <Dialog
           open={open1}
           onClose={handleClose1}
@@ -468,22 +484,49 @@ const ShortestPath = () => {
           maxWidth="xl"
           fullWidth={true}
         >
-          <DialogTitle id="alert-dialog-title" style={{ fontWeight: 'bold',textDecoration: 'underline' }}>{"Distance Matrix"}</DialogTitle>
+          <DialogTitle
+            id="alert-dialog-title"
+            style={{ fontWeight: "bold", textDecoration: "underline" }}
+          >
+            {"Distance Matrix"}
+          </DialogTitle>
           <DialogContent>
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>Location</TableCell>
+                    <TableCell
+                      style={{
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Location
+                    </TableCell>
                     {locations.map((location, index) => (
-                      <TableCell key={index} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{location.name}</TableCell>
+                      <TableCell
+                        key={index}
+                        style={{
+                          fontWeight: "bold",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {location.name}
+                      </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {distanceMatrix.map((row, rowIndex) => (
                     <TableRow key={rowIndex}>
-                      <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{locations[rowIndex].name}</TableCell>
+                      <TableCell
+                        style={{
+                          fontWeight: "bold",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {locations[rowIndex].name}
+                      </TableCell>
                       {row.map((cell, cellIndex) => (
                         <TableCell
                           key={cellIndex}
@@ -510,6 +553,7 @@ const ShortestPath = () => {
         <Button variant="outlined" color="primary" onClick={handleClickOpen2}>
           View Optimize Matrix
         </Button>
+        {/* Dialog to display the optimized distance matrix */}
         <Dialog
           open={open2}
           onClose={handleClose2}
@@ -518,7 +562,10 @@ const ShortestPath = () => {
           maxWidth="xl"
           fullWidth={true}
         >
-          <DialogTitle id="alert-dialog-title" style={{ fontWeight: 'bold',textDecoration: 'underline' }}>
+          <DialogTitle
+            id="alert-dialog-title"
+            style={{ fontWeight: "bold", textDecoration: "underline" }}
+          >
             {"Optimize Distance Matrix"}
           </DialogTitle>
           <DialogContent>
@@ -526,16 +573,38 @@ const ShortestPath = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ fontWeight: 'bold',textDecoration: 'underline' }}>Location</TableCell>
+                    <TableCell
+                      style={{
+                        fontWeight: "bold",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Location
+                    </TableCell>
                     {locations.map((location, index) => (
-                      <TableCell key={index} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{location.name}</TableCell>
+                      <TableCell
+                        key={index}
+                        style={{
+                          fontWeight: "bold",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {location.name}
+                      </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {optimizedDistanceMatrix.map((row, rowIndex) => (
                     <TableRow key={rowIndex}>
-                      <TableCell style={{ fontWeight: 'bold', textDecoration: 'underline' }}>{locations[rowIndex].name}</TableCell>
+                      <TableCell
+                        style={{
+                          fontWeight: "bold",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {locations[rowIndex].name}
+                      </TableCell>
                       {row.map((cell, cellIndex) => (
                         <TableCell key={cellIndex}>
                           {parseFloat(cell).toFixed(2)} km
@@ -554,7 +623,7 @@ const ShortestPath = () => {
           </DialogActions>
         </Dialog>
       </div>
-
+      {/* Snackbar notifications for errors and success messages */}
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={alertBox}

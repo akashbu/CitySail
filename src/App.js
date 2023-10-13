@@ -10,7 +10,9 @@ import Blockers from './components/Blockers/Blockers'
 import Footer from './components/Footer/Footer'; 
 
 function App() { 
+
   return ( 
+    //Routing through all the components
     <Router> 
       <Navbar /> 
       <Routes> 

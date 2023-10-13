@@ -89,7 +89,7 @@ const Blockers = () => {
 
   useEffect(() => {
     async function fetchDataFromServer() {
-      const apiUrl = "http://localhost:5000/data"; // Replace 'items' with your resource name
+      const apiUrl = "https://map-project-qf27.onrender.com/data"; // Replace 'items' with your resource name
 
       const jsonData = localStorage.getItem("distanceMatrix");
 
