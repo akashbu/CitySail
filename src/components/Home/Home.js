@@ -3,7 +3,7 @@ import backgroundImage from '../../image/map.jpeg'; // Replace with the actual p
 
 const Home = () => {
   const textLines = ['Navigate through the shortest path!!', 'Discover new routes!!', 'Reach your destination faster!!'];
-  const typingSpeed = 100; // Speed in milliseconds between each letter
+  const typingSpeed = 50; // Speed in milliseconds between each letter
   const lineChangeDelay = 1000; // Delay between lines
 
   const [currentLineIndex, setCurrentLineIndex] = useState(0);

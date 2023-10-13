@@ -1,18 +1,29 @@
-import React from 'react'; 
+import React from 'react';
+import YouTube from 'react-youtube';
+import './Guide.css';
+const Guide = () => {
+  // YouTube video options
+  const videoOptions = {
+    height: '800',
+    width: '1200',
+    playerVars: {
+      autoplay: 0,
+    },
+  };
 
-const Guide = () => { 
-return ( 
-	<div 
-	style={{ 
-		display: 'flex', 
-		justifyContent: 'Right', 
-		alignItems: 'Right', 
-		height: '100vh'
-	}} 
-	> 
-	<h1>Welcome to Guide</h1> 
-	</div> 
-); 
-}; 
+  // YouTube video ID extracted from the provided link
+  const videoId = 'm3dyeU9XWr0';
+
+  return (
+    <div className="guide-container">
+      <div className="content">
+        <h1>Watch out the YouTube tutorial for a step-by-step guide on how to run the application.</h1>
+      </div>      
+	  <div className="youtube-container">
+        <YouTube videoId={videoId} opts={videoOptions} />
+      </div>
+    </div>
+  );
+};
 
 export default Guide;
