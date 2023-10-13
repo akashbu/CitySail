@@ -17,6 +17,7 @@ import "./Blocker.css";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
 
+// Sample location data
 const locations = [
   { id: 0, name: "Fullerton", lat: 33.8704, lon: -117.9242 },
   { id: 1, name: "Long Beach", lat: 33.77005, lon: -118.193741 },
@@ -40,6 +41,7 @@ const locations = [
   { id: 19, name: "Diamond Bar", lat: 34.02649, lon: -117.810264 },
 ];
 
+// Sample Autocomplete options
 const list = [
   { label: "Fullerton" },
   { label: "Long Beach" },
@@ -76,6 +78,7 @@ const Blockers = () => {
     destination: null,
   });
 
+  // Handler for closing snackbar
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -88,6 +91,7 @@ const Blockers = () => {
   };
 
   useEffect(() => {
+    // Function to fetch data from server
     async function fetchDataFromServer() {
       const apiUrl = "https://map-project-qf27.onrender.com/data"; // Replace 'items' with your resource name
 
@@ -110,6 +114,7 @@ const Blockers = () => {
     fetchDataFromServer();
   }, []);
 
+  // Function to report blockage
   const reportBlockage = async () => {
     const sourceName = sourceRef.current?.label;
     const destinationName = destinationRef.current?.label;
@@ -152,6 +157,7 @@ const Blockers = () => {
     }
   };
 
+  // Function to clear blockage
   const clearBlockage = () => {
     localStorage.removeItem("distanceMatrix");
     setClear(true);

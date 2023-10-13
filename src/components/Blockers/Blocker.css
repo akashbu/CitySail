@@ -1,29 +1,34 @@
-.blocker{
-    margin-top: 50px;
+/* Margin for the entire blocker section */
+.blocker {
+  margin-top: 50px;
 }
 
-.image-wrapper{
-    margin: 50px;
+/* Margin for the image wrapper */
+.image-wrapper {
+  margin: 50px;
 }
 
+/* Styling for the report button */
 .buttonclass {
-    margin-top: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .buttonerror {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+/* Styling for the clear button */
+.buttonerror {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .autocomplete-container-blocker{
-    margin-top: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-  }
+/* Styling for the autocomplete container */
+.autocomplete-container-blocker {
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}

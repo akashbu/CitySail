@@ -1,37 +1,44 @@
+/* Styles for the content container */
 .content {
-    text-align: center;
-    padding: 20px;
-    background-color: #afd8fa;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    max-width: 95%;
-  }
-  
-  .content h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  .content p {
-    font-size: 18px;
-    line-height: 1.5;
-  }
-  
-  .image-wrapper {
-    text-align: center;
-  }
-  
-  .profile-info {
-    text-align: center;
-  }
-  
-  .profile-info h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  .profile-info p {
-    font-size: 18px;
-    line-height: 1.5;
-  }
+  text-align: center;
+  padding: 20px;
+  background-color: #afd8fa;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 95%;
+}
+
+/* Styles for h1 within the content */
+.content h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Styles for paragraphs within the content */
+.content p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Styles for image wrappers */
+.image-wrapper {
+  text-align: center;
+}
+
+/* Styles for profile information */
+.profile-info {
+  text-align: center;
+}
+
+/* Styles for h1 within profile info */
+.profile-info h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Styles for paragraphs within profile info */
+.profile-info p {
+  font-size: 18px;
+  line-height: 1.5;
+}

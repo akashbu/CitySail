@@ -5,8 +5,10 @@ import logoImage from '../../image/logo.png';
 const Navbar = () => {
   return (
     <>
+      {/* Navigation bar */}
       <Nav style={{ paddingLeft: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Logo */}
           <img
             src={logoImage}
             alt="Logo"
@@ -16,10 +18,12 @@ const Navbar = () => {
               marginRight: '10px', // Optional: Add some right margin for spacing
             }}
           />
+          {/* Logo text */}
           <span style={{ color: 'white', fontSize: '2em' }}>CitySail</span>
         </div>
         <Bars />
 
+        {/* Navigation links */}
         <NavMenu>
           <NavLink to="/home">Home</NavLink>
           <NavLink to="/about">About</NavLink>
